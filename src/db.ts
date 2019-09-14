@@ -1,7 +1,5 @@
-import Mongo, {  } from "mongodb"
+import { MongoClient, ObjectID } from "mongodb"
 
-const MongoClient = Mongo.MongoClient
-const ObjectID = Mongo.ObjectID
 const dbname = "Cartelera"
 const url = "mongodb://localhost:27017"
 const menuOptions = { useNewUrlParser: true, useUnifiedTopology: true  }
