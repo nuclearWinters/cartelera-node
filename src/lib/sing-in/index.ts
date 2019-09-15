@@ -1,45 +1,16 @@
-import express, { Application, Request, Response, NextFunction } from "express"
-import db from "../../db"
-import bcrypt from "bcrypt"
+import express, { Request, Response, NextFunction, Router } from "express"
 import jwt from "jsonwebtoken"
+import { checkIfUserExist, compareHashedPassword } from "../middlewares"
 
-const collection = "administradores"
+const router: Router = express.Router();
 
-const app: Application = module.exports = express()
-
-const checkIfUserExist = (req: Request, res: Response, next: NextFunction) => {
-    const { Usuario } = req.body
-    db.getDB().collection(collection).find({Usuario}).toArray((err: any, documents: any) => {
-        if (err) {
-            res.send("Error")
-        } else {
-            if (documents.length !== 0) {
-                req.body.user = documents[0]
-                next()
-            }
-            else {
-                res.send("Error")
-            }
-        }
-    })
-}
-
-const compareHashedPassword = async (req: Request, res: Response, next: NextFunction) => {
-    const { user, Contraseña } = req.body
-    const match = await bcrypt.compare(Contraseña, user.Contraseña)
-    if (match) next()
-    else res.send("Error")
-}
-
-const createToken = (req: Request, res: Response, next: NextFunction) => {
-    const { Usuario, user } = req.body
+router.post('/sing-in', checkIfUserExist, compareHashedPassword, (req: Request, res: Response, next: NextFunction) => {
+    const { user } = req.body
     req.body.token = jwt.sign({
-        Usuario,
+        Nombre: user.Nombre,
+        Usuario: user.Usuario,
     }, user.Contraseña);
     res.send(req.body.token)
-}
+});
 
-app.post('/sing-in', checkIfUserExist, compareHashedPassword, createToken);
-
-
-export = app
+export default router
