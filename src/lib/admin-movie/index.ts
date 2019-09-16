@@ -1,13 +1,14 @@
-import express, { Request, Response, NextFunction, Router } from "express"
-import { ObjectID, Db } from "mongodb"
+import express, { Response, NextFunction, Router } from "express"
+import { ObjectID } from "mongodb"
 import { PeliculaConID } from "./types"
 import { decodeJWT, checkIfUserExist, validateJWT } from "../middlewares"
+import { RequestDB } from "../../app.d"
 
 const router: Router = express.Router();
 const collectionP = "peliculas"
 
-router.put('/admin-put-movie', decodeJWT, checkIfUserExist, validateJWT, (req: Request, res: Response, next: NextFunction) => {
-    const db: Db = req.app.locals.db
+router.put('/admin-put-movie', decodeJWT, checkIfUserExist, validateJWT, (req: RequestDB, res: Response, next: NextFunction) => {
+    const db = req.app.locals.db
     const { _id, Titulo, Director, Duración, Inicio_exhibición, Fin_exhibición }: PeliculaConID = req.body.pelicula
     db.collection(collectionP).findOneAndUpdate({_id: new ObjectID(_id)}, {$set: {
         Titulo,
@@ -23,8 +24,8 @@ router.put('/admin-put-movie', decodeJWT, checkIfUserExist, validateJWT, (req: R
     })
 });
 
-router.delete('/admin-delete-movie', decodeJWT, checkIfUserExist, validateJWT, (req: Request, res: Response, next: NextFunction) => {
-    const db: Db = req.app.locals.db
+router.delete('/admin-delete-movie', decodeJWT, checkIfUserExist, validateJWT, (req: RequestDB, res: Response, next: NextFunction) => {
+    const db = req.app.locals.db
     const _id: string = req.body.pelicula._id
     db.collection(collectionP).findOneAndDelete({_id: new ObjectID(_id)}, (err: any, results: any) => {
         if (err) {

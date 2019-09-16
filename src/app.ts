@@ -1,4 +1,4 @@
-import express, { Application, Response, Request, NextFunction } from 'express'
+import express, { Application, Response, NextFunction } from 'express'
 import cors from "cors"
 import bodyParser from "body-parser"
 import add_movie from "./lib/add-movie"
@@ -7,9 +7,11 @@ import admin_movie from "./lib/admin-movie"
 import { MongoClient } from "mongodb"
 import config from "./config"
 
+import { ApplicationDB, RequestDB } from "./app.d"
+
 const menuOptions = { useNewUrlParser: true, useUnifiedTopology: true }
 
-const app: Application = express();
+const app: ApplicationDB = express();
 
 app.use(cors())
 app.use(bodyParser.json())
@@ -18,7 +20,7 @@ app.use(add_movie);
 app.use(sing_in)
 app.use(admin_movie)
 
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+app.use((err: any, req: RequestDB, res: Response, next: NextFunction) => {
     console.log("error in middleware")
     console.error(err.stack)
     res.send("Error Interno")

@@ -1,12 +1,12 @@
-import express, { Router, Request, Response, NextFunction } from 'express';
-import { Db } from 'mongodb';
+import express, { Router, Response, NextFunction } from 'express';
 import { Pelicula } from "./types"
+import { RequestDB } from "../../app.d"
 
 const router: Router = express.Router();
 const collection: string = "peliculas"
 
-router.get('/get-movie', (req: Request, res: Response, next: NextFunction) => {
-    const db: Db = req.app.locals.db;
+router.get('/get-movie', (req: RequestDB, res: Response, next: NextFunction) => {
+    const db = req.app.locals.db;
     db.collection(collection).find({}).toArray((err: any, documents: any) => {
         if (err) {
             next(err)
@@ -16,8 +16,8 @@ router.get('/get-movie', (req: Request, res: Response, next: NextFunction) => {
     })
 });
 
-router.post('/post-movie', (req: Request, res: Response, next: NextFunction) => {
-    const db: Db = req.app.locals.db
+router.post('/post-movie', (req: RequestDB, res: Response, next: NextFunction) => {
+    const db = req.app.locals.db
     const {
         Titulo,
         Director,
