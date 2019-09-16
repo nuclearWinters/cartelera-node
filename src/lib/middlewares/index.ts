@@ -2,14 +2,14 @@ import { Request, Response, NextFunction } from "express"
 import { Db } from "mongodb"
 import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs"
-import { UserInput, User } from "./types"
+import { UserFromInput, UserFromDB } from "./types"
 
 const collectionA = "administradores"
 
 const decodeJWT = (req: Request, res: Response, next: NextFunction) => {
     const token: string = req.body.token
     if (token) {
-        req.body.userInput = jwt.decode(req.body.token)
+        req.body.userFromInput = jwt.decode(req.body.token)
         next()
     } else {
         try {
@@ -22,13 +22,13 @@ const decodeJWT = (req: Request, res: Response, next: NextFunction) => {
 }
 
 const checkIfUserExist = (req: Request, res: Response, next: NextFunction) => {
-    const userInput: UserInput = req.body.userInput
+    const userFromInput: UserFromInput = req.body.userFromInput
     const db: Db = req.app.locals.db
-    db.collection(collectionA).find({Usuario: userInput.Usuario}).toArray((err: any, documents: any) => {
+    db.collection(collectionA).find({Usuario: userFromInput.Usuario}).toArray((err: any, documents: any) => {
         if (err) next(err)
         else {
             if (documents.length !== 0) {
-                req.body.user = documents[0]
+                req.body.userFromDB = documents[0]
                 next()
             }
             else {
@@ -44,16 +44,16 @@ const checkIfUserExist = (req: Request, res: Response, next: NextFunction) => {
 }
 
 const validateJWT = (req: Request, res: Response, next: NextFunction) => {
-    const { token, user }: { token: string, user: User } = req.body
-    jwt.verify(token, user.Contraseña, (err: any, decoded: any) => {
+    const { token, userFromDB }: { token: string, userFromDB: UserFromDB } = req.body
+    jwt.verify(token, userFromDB.Contraseña, (err: any, decoded: any) => {
         if (err) next(err)
         else next()
     });
 }
 
 const compareHashedPassword = async (req: Request, res: Response, next: NextFunction) => {
-    const { user, userInput }: {user: User, userInput: UserInput} = req.body
-    bcrypt.compare(userInput.Contraseña, user.Contraseña)
+    const { userFromDB, userFromInput }: {userFromDB: UserFromDB, userFromInput: UserFromInput} = req.body
+    bcrypt.compare(userFromInput.Contraseña, userFromDB.Contraseña)
     .then(match => {
         if (match) next()
         else {
