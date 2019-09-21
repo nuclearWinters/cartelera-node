@@ -44,16 +44,16 @@ const checkIfUserExist = (req: RequestDB, res: Response, next: NextFunction) => 
 }
 
 const validateJWT = (req: RequestDB, res: Response, next: NextFunction) => {
-    const { token, user }: { token: string, user: UserFromDB } = req.body
-    jwt.verify(token, user.Contraseña, (err: any, decoded: any) => {
+    const { token, userFromDB }: { token: string, userFromDB: UserFromDB } = req.body
+    jwt.verify(token, userFromDB.Contraseña, (err: any, decoded: any) => {
         if (err) next(err)
         else next()
     });
 }
 
 const compareHashedPassword = async (req: RequestDB, res: Response, next: NextFunction) => {
-    const { user, userInput }: {user: UserFromDB, userInput: UserFromInput} = req.body
-    bcrypt.compare(userInput.Contraseña, user.Contraseña)
+    const { userFromDB, userInput }: {userFromDB: UserFromDB, userInput: UserFromInput} = req.body
+    bcrypt.compare(userInput.Contraseña, userFromDB.Contraseña)
     .then(match => {
         if (match) next()
         else {

@@ -10,8 +10,8 @@ router.post('/sing-in', checkIfUserExist, compareHashedPassword, (req: RequestDB
     const userFromDB: UserFromDB = req.body.userFromDB
     req.body.token = jwt.sign({
         Nombre: userFromDB.Nombre,
-        Usuario: userFromDB.Usuario,
-    }, userFromDB.Contraseña);
+        Usuario: userFromDB.Usuario
+    }, userFromDB.Contraseña, { expiresIn: '1h' });
     res.send(req.body.token)
 });
 
