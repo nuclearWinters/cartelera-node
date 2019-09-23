@@ -16,7 +16,7 @@ router.get('/get-movie', (req: RequestDB, res: Response, next: NextFunction) => 
     })
 });
 
-router.post('/post-movie', (req: RequestDB, res: Response, next: NextFunction) => {
+router.post('/post-movie', async (req: RequestDB, res: Response, next: NextFunction) => {
     const db = req.app.locals.db
     const {
         Titulo,
@@ -25,13 +25,25 @@ router.post('/post-movie', (req: RequestDB, res: Response, next: NextFunction) =
         Inicio_exhibición,
         Fin_exhibición
     }: Pelicula = req.body
-    db.collection(collection).insertOne({
-        Titulo,
-        Director,
-        Duración,
-        "Inicio exhibición": new Date(Inicio_exhibición),
-        "Fin exhibición": new Date(Fin_exhibición)
-    }).then(result => res.json(result)).catch(next)
+    let lastRecord = await db.collection(collection).find().sort({Creado: -1}).limit(1).toArray()
+    const dateNow = new Date().getTime();
+    const dateLastRecord = new Date(lastRecord[0].Creado).getTime();
+    const diffTime = Math.abs(dateNow - dateLastRecord);
+    const diffSeconds = Math.floor(diffTime / (1000)); 
+    if (diffSeconds >= 300) {
+        db.collection(collection).insertOne({
+            Titulo,
+            Director,
+            Duración,
+            "Inicio exhibición": new Date(Inicio_exhibición),
+            "Fin exhibición": new Date(Fin_exhibición),
+            Creado: new Date(),
+            Modificado: new Date()
+        }).then(result => res.json(result)).catch(next)
+    }
+    else {
+        res.status(429).json({falta: 300-diffSeconds})
+    }
 });
 
 export default router
