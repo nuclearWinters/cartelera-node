@@ -36,7 +36,7 @@ MongoClient.connect(config.database.url, menuOptions, (err, client) => {
     // Set database connection and call CB
     else {
         app.locals.db = client.db("Cartelera")
-        app.listen(3001, () => {
+        app.listen(process.env.PORT || 3001, () => {
             console.log('Example app listening on port 3000!');
         });
     }

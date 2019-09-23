@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken"
 import bcrypt from "bcryptjs"
 import { UserFromInput, UserFromDB } from "./types"
 import { RequestDB } from "../../app.d"
-//comment
+
 const collectionA = "administradores"
 
 const decodeJWT = (req: RequestDB, res: Response, next: NextFunction) => {
